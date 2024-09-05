@@ -10,6 +10,11 @@ public class DeadLine : MonoBehaviour
     {
         EventDispatcher.Instance.RegisterListener(EventID.On_Check_Dead, CheckDead);
     }
+    
+    private void OnDisable()
+    {
+        EventDispatcher.Instance.RemoveListener(EventID.On_Check_Dead, CheckDead);
+    }
 
     private void CheckDead(object param)
     {
@@ -24,7 +29,7 @@ public class DeadLine : MonoBehaviour
             {
                 if (hits[i].collider.transform.position.y > spawnPos.position.y)
                 {
-                    Debug.Log("Dead");
+                    EventDispatcher.Instance.PostEvent(EventID.On_Player_Dead);
                 }
             }
         }

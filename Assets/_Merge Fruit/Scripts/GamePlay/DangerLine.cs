@@ -15,6 +15,11 @@ public class DangerLine : MonoBehaviour
         EventDispatcher.Instance.RegisterListener(EventID.On_Check_Danger, CheckDanger);
     }
 
+    private void OnDisable()
+    {
+        EventDispatcher.Instance.RemoveListener(EventID.On_Check_Danger, CheckDanger);
+    }
+
     private void CheckDanger(object param)
     {
         Vector2 direction = (right.position - left.position).normalized;
@@ -24,7 +29,7 @@ public class DangerLine : MonoBehaviour
 
         for (int i = 0; i < hits.Length; i++)
         {
-            if (hits[i].collider.CompareTag("Fruit"))
+            if (hits[i].collider.CompareTag("Fruit") && hits[i].collider.GetComponent<Fruit>().rb.velocity.y > -0.25f)
             {
                 anim.enabled = true;
                 EventDispatcher.Instance.PostEvent(EventID.On_Check_Dead);

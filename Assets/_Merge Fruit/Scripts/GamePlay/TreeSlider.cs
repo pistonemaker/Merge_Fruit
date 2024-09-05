@@ -38,6 +38,7 @@ public class TreeSlider : Singleton<TreeSlider>
 
     private IEnumerator DetachFruit()
     {
+        FruitBox.Instance.AddFruit(curFruit);
         canhold = false;
         curFruit.coll.isTrigger = false;
         curFruit.transform.SetParent(null);
@@ -51,6 +52,11 @@ public class TreeSlider : Singleton<TreeSlider>
 
     private void Update()
     {
+        if (FruitBox.Instance.isRemovingFruit || FruitBox.Instance.isUpgradingFruit)
+        {
+            return;
+        }
+        
         if (Input.GetMouseButtonDown(0) && !IsMouseOverUIElement())
         {
             isholding = true;
@@ -63,8 +69,8 @@ public class TreeSlider : Singleton<TreeSlider>
             Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             transform.position = new Vector3(mousePosition.x, transform.position.y, 0);
         }
-
-        if (Input.GetMouseButtonUp(0))
+        
+        if (Input.GetMouseButtonUp(0) && !IsMouseOverUIElement())
         {
             isholding = false;
             if (canhold)

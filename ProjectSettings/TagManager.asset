@@ -40,6 +40,12 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Shake
+    uniqueID: 3210747201
+    locked: 0
+  - name: Background
+    uniqueID: 1881009663
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
@@ -48,4 +54,7 @@ TagManager:
     locked: 0
   - name: Fruit
     uniqueID: 758031311
+    locked: 0
+  - name: UI
+    uniqueID: 1459384803
     locked: 0

@@ -4,7 +4,6 @@ public class GameManager : Singleton<GameManager>
 {
     public GameData data;
     private int nextID;
-    public int fruitID;
 
     private void OnEnable()
     {
@@ -23,6 +22,7 @@ public class GameManager : Singleton<GameManager>
     {
         int id = Random.Range(0, 4);
         nextID = Random.Range(0, 4);
+        this.PostEvent(EventID.On_Show_Next_Fruit, nextID);
         return data.fruitDatas[id].fruitPrefab;
     }
     
@@ -30,6 +30,7 @@ public class GameManager : Singleton<GameManager>
     {
         int id = nextID;
         nextID = Random.Range(0, 4);
+        this.PostEvent(EventID.On_Show_Next_Fruit, nextID);
         return data.fruitDatas[id].fruitPrefab;
     }
 }
