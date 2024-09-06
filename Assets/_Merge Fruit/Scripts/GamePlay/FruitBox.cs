@@ -19,11 +19,16 @@ public class FruitBox : Singleton<FruitBox>
         EventDispatcher.Instance.RemoveListener(EventID.On_Player_Dead, ChangeFruitAnim);
     }
 
+    public int GetFruitNumber()
+    {
+        return fruits.Count;
+    }
+
     public void AddFruit(Fruit fruit)
     {
         fruits.Add(fruit);
     }
-    
+
     public void RemoveFruit(Fruit fruit)
     {
         fruits.Remove(fruit);
@@ -40,6 +45,40 @@ public class FruitBox : Singleton<FruitBox>
         }
     }
 
+    public void ShowFruitsTarget()
+    {
+        for (int i = 0; i < fruits.Count; i++)
+        {
+            fruits[i].target.SetActive(true);
+        }
+    }
+
+    public void HideFruitsTarget()
+    {
+        for (int i = 0; i < fruits.Count; i++)
+        {
+            fruits[i].target.SetActive(false);
+        }
+    }
+
+    public bool HasSuitableFruit()
+    {
+        bool hasSuitableFruit = false;
+        
+        for (int i = 0; i < fruits.Count; i++)
+        {
+            if (fruits[i].id == 0 || fruits[i].id == 1)
+            {
+                PoolingManager.Despawn(fruits[i].gameObject);
+                RemoveFruit(fruits[i]);
+                hasSuitableFruit = true;
+                break;
+            }
+        }
+        
+        return hasSuitableFruit;
+    }
+
     public void RemoveSmallestFruit()
     {
         for (int i = 0; i < fruits.Count; i++)
@@ -51,7 +90,7 @@ public class FruitBox : Singleton<FruitBox>
                 i--;
             }
         }
-        
+
         StartCoroutine(UIManager.Instance.DeactiveBlockClick());
     }
 
@@ -61,7 +100,7 @@ public class FruitBox : Singleton<FruitBox>
         {
             return;
         }
-        
+
         if (Input.GetMouseButtonDown(0))
         {
             Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -72,14 +111,20 @@ public class FruitBox : Singleton<FruitBox>
                 if (hits[i].collider.CompareTag("Fruit") && !hits[i].collider.isTrigger)
                 {
                     var fruit = hits[i].collider.GetComponent<Fruit>();
-                    PoolingManager.Despawn(fruit.gameObject);
-                    RemoveFruit(fruit);
-                    StartCoroutine(UIManager.Instance.DeactiveBlockClick());
-                    isRemovingFruit = false;
+                    OnBoomExplode(fruit);
                     break;
                 }
             }
         }
+    }
+
+    private void OnBoomExplode(Fruit fruit)
+    {
+        PoolingManager.Despawn(fruit.gameObject);
+        RemoveFruit(fruit);
+        StartCoroutine(UIManager.Instance.DeactiveBlockClick());
+        HideFruitsTarget();
+        isRemovingFruit = false;
     }
 
     public void UpgradeFruit()
@@ -88,7 +133,7 @@ public class FruitBox : Singleton<FruitBox>
         {
             return;
         }
-        
+
         if (Input.GetMouseButtonDown(0))
         {
             Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -103,11 +148,19 @@ public class FruitBox : Singleton<FruitBox>
                     Vector3 pos = fruit.transform.position;
                     PoolingManager.Despawn(fruit.gameObject);
                     RemoveFruit(fruit);
-                    var newFruit = PoolingManager.Spawn(GameManager.Instance.data.fruitDatas[id + 1].fruitPrefab, 
+                    var newFruit = PoolingManager.Spawn(GameManager.Instance.data.fruitDatas[id + 1].fruitPrefab,
                         pos, Quaternion.identity);
                     newFruit.rb.gravityScale = 1f;
+                    
+                    var mergeFx1 = PoolingManager.Spawn(GameManager.Instance.mergeFx, newFruit.transform.position, Quaternion.identity);
+                    mergeFx1.ShowMergeFx(newFruit.id);
+                    var mergeFx2 = PoolingManager.Spawn(GameManager.Instance.mergeFx, newFruit.transform.position, Quaternion.identity);
+                    mergeFx2.transform.Rotate(new Vector3(0f, 0f, -135f));
+                    mergeFx2.ShowMergeFx(newFruit.id);
+                    
                     AddFruit(newFruit);
                     StartCoroutine(UIManager.Instance.DeactiveBlockClick());
+                    HideFruitsTarget();
                     isUpgradingFruit = false;
                     return;
                 }
@@ -127,31 +180,26 @@ public class FruitBox : Singleton<FruitBox>
         Camera mainCamera = Camera.main;
         float shakeDuration = 2f;
         float cameraZoomDuration = 2f;
-
         Sequence sequence = DOTween.Sequence();
-
         sequence.Append(mainCamera.DOOrthoSize(6.5f, cameraZoomDuration).SetEase(Ease.InOutQuad));
-
         sequence.AppendCallback(() =>
         {
             Vector3 shakeStrength = new Vector3(0.3f, 0.2f, 0);
             int vibrato = 10;
             float randomness = 90;
-
             transform.DOShakePosition(shakeDuration, shakeStrength, vibrato, randomness);
-
             Sequence rotationSequence = DOTween.Sequence();
             rotationSequence
-                .Append(transform.DORotate(new Vector3(0, 0, 20), 0.4f).SetEase(Ease.InOutSine))  
-                .Append(transform.DORotate(new Vector3(0, 0, -20), 0.4f).SetEase(Ease.InOutSine)) 
-                .Append(transform.DORotate(new Vector3(0, 0, 10), 0.4f).SetEase(Ease.InOutSine))  
-                .Append(transform.DORotate(new Vector3(0, 0, -10), 0.4f).SetEase(Ease.InOutSine)) 
-                .Append(transform.DORotate(Vector3.zero, 0.4f).SetEase(Ease.InOutSine))  
+                .Append(transform.DORotate(new Vector3(0, 0, 20), 0.4f).SetEase(Ease.InOutSine))
+                .Append(transform.DORotate(new Vector3(0, 0, -20), 0.4f).SetEase(Ease.InOutSine))
+                .Append(transform.DORotate(new Vector3(0, 0, 10), 0.4f).SetEase(Ease.InOutSine))
+                .Append(transform.DORotate(new Vector3(0, 0, -10), 0.4f).SetEase(Ease.InOutSine))
+                .Append(transform.DORotate(Vector3.zero, 0.4f).SetEase(Ease.InOutSine))
                 .OnComplete(() =>
                 {
-                    StartCoroutine(UIManager.Instance.DeactiveBlockClick());
                     mainCamera.DOOrthoSize(5f, cameraZoomDuration).SetEase(Ease.InOutQuad).OnComplete(() =>
                     {
+                        StartCoroutine(UIManager.Instance.DeactiveBlockClick());
                         TreeSlider.Instance.gameObject.SetActive(true);
                         UIManager.Instance.SetCanvasSortingLayer("Default");
                     });

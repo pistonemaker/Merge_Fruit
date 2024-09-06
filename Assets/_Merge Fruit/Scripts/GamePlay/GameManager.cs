@@ -3,6 +3,8 @@ using Random = UnityEngine.Random;
 public class GameManager : Singleton<GameManager>
 {
     public GameData data;
+    public MergeFx mergeFx;
+    public FailNotice failNotice;
     private int nextID;
 
     private void OnEnable()

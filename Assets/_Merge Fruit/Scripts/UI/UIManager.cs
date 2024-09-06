@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,35 +11,67 @@ public class UIManager : Singleton<UIManager>
     public Image nextFruit;
     public Image blockClick;
     public List<Sprite> fruitSprites;
+    
     public Button removeBoostButton;
     public Button boomBoostButton;
     public Button upgradeBoostButton;
     public Button shakeBoostButton;
+    public Button settingButton;
+    
     public Camera captureCam;
     public EndPanel endPanel;
+    public Setting setting;
+    public RemoveBoostPanel removeBoostPanel;
+    public BoomBoostPanel boomBoostPanel;
+    public UpgradeBoostPanel upgradeBoostPanel;
+    public ShakeBoostPanel shakeBoostPanel;
 
     private void OnEnable()
     {
         canvas = GetComponent<Canvas>();
         blockClick.gameObject.SetActive(false);
         this.RegisterListener(EventID.On_Show_Next_Fruit, param => ShowNextFruit((int)param));
+        EventDispatcher.Instance.RegisterListener(EventID.On_Player_Dead, ShowEndPanel);
+        RegisterBoosterListener();
+        
         removeBoostButton.onClick.AddListener(RemoveBoost);
         boomBoostButton.onClick.AddListener(BoomBoost);
         upgradeBoostButton.onClick.AddListener(UpgradeBoost);
         shakeBoostButton.onClick.AddListener(ShakeBoost);
-        EventDispatcher.Instance.RegisterListener(EventID.On_Player_Dead, ShowEndPanel);
+        
+        settingButton.onClick.AddListener(() =>
+        {
+            blockClick.gameObject.SetActive(true);
+            setting.gameObject.SetActive(true);
+        });
     }
 
     private void OnDisable()
     {
         this.RemoveListener(EventID.On_Show_Next_Fruit, param => ShowNextFruit((int)param));
+        EventDispatcher.Instance.RemoveListener(EventID.On_Player_Dead, ShowEndPanel);
+        RemoveBoosterListener();
+            
         removeBoostButton.onClick.RemoveAllListeners();
         boomBoostButton.onClick.RemoveAllListeners();
         upgradeBoostButton.onClick.RemoveAllListeners();
         shakeBoostButton.onClick.RemoveAllListeners();
-        EventDispatcher.Instance.RemoveListener(EventID.On_Player_Dead, ShowEndPanel);
+        settingButton.onClick.RemoveAllListeners();
     }
 
+    private void RegisterBoosterListener()
+    {
+        EventDispatcher.Instance.RegisterListener(EventID.On_Use_Remove_Boost, HandleRemoveBoost);
+        EventDispatcher.Instance.RegisterListener(EventID.On_Use_Boom_Boost, HandleBoomBoost);
+        EventDispatcher.Instance.RegisterListener(EventID.On_Use_Upgrade_Boost, HandleUpgradeBoost);
+        EventDispatcher.Instance.RegisterListener(EventID.On_Use_Shake_Boost, HanldeShakeBoost);
+    }
+    
+    private void RemoveBoosterListener()
+    {
+        
+    }
+    
     private void ShowNextFruit(int id)
     {
         nextFruit.transform.localScale = Vector3.zero;
@@ -48,26 +81,150 @@ public class UIManager : Singleton<UIManager>
 
     private void RemoveBoost()
     {
+        var canUse = FruitBox.Instance.HasSuitableFruit();
+        
+        if (!canUse)
+        {
+            var failNotice = PoolingManager.Spawn(GameManager.Instance.failNotice, transform.transform.position, Quaternion.identity);
+            failNotice.ShowNotice("There is no suitable Object in the Box");
+            return;
+        }
+        
+        var boostNumber = PlayerPrefs.GetInt(DataKey.RemoveBoost);
+        
+        if (boostNumber == 0)
+        {
+            removeBoostPanel.gameObject.SetActive(true);
+            return;
+        }
+        
+        EventDispatcher.Instance.PostEvent(EventID.On_Use_Remove_Boost);
+    }
+
+    private void HandleRemoveBoost(object param)
+    {
         blockClick.gameObject.SetActive(true);
+
+        if (FruitBox.Instance.GetFruitNumber() == 0)
+        {
+            var failNotice = PoolingManager.Spawn(GameManager.Instance.failNotice, transform.transform.position, Quaternion.identity);
+            failNotice.ShowNotice("There is no suitable Object in the Box");
+            blockClick.gameObject.SetActive(false);
+            return;
+        }
+        
         FruitBox.Instance.RemoveSmallestFruit();
     }
 
     private void BoomBoost()
     {
+        if (FruitBox.Instance.GetFruitNumber() == 0)
+        {
+            var failNotice = PoolingManager.Spawn(GameManager.Instance.failNotice, transform.transform.position, Quaternion.identity);
+            failNotice.ShowNotice("There is no suitable Object in the Box");
+            return;
+        }
+        
+        var boostNumber = PlayerPrefs.GetInt(DataKey.BoomBoost);
+        
+        if (boostNumber == 0)
+        {
+            boomBoostPanel.gameObject.SetActive(true);
+            return;
+        }
+        
+        EventDispatcher.Instance.PostEvent(EventID.On_Use_Boom_Boost);
+    }
+
+    private void HandleBoomBoost(object param)
+    {
         blockClick.gameObject.SetActive(true);
         FruitBox.Instance.isRemovingFruit = true;
+        
+        if (FruitBox.Instance.GetFruitNumber() == 0)
+        {
+            var failNotice = PoolingManager.Spawn(GameManager.Instance.failNotice, transform.transform.position, Quaternion.identity);
+            failNotice.ShowNotice("There is no suitable Object in the Box");
+            FruitBox.Instance.isRemovingFruit = false;
+            StartCoroutine(DeactiveBlockClick());
+            return;
+        }
+        
+        FruitBox.Instance.ShowFruitsTarget();
     }
 
     private void UpgradeBoost()
     {
+        if (FruitBox.Instance.GetFruitNumber() == 0)
+        {
+            var failNotice = PoolingManager.Spawn(GameManager.Instance.failNotice, transform.transform.position, Quaternion.identity);
+            failNotice.ShowNotice("There is no suitable Object in the Box");
+            return;
+        }
+        
+        var boostNumber = PlayerPrefs.GetInt(DataKey.UpgradeBoost);
+        
+        if (boostNumber == 0)
+        {
+            upgradeBoostPanel.gameObject.SetActive(true);
+            return;
+        }
+        
+        EventDispatcher.Instance.PostEvent(EventID.On_Use_Upgrade_Boost);
+    }
+
+    private void HandleUpgradeBoost(object param)
+    {
         blockClick.gameObject.SetActive(true);
         FruitBox.Instance.isUpgradingFruit = true;
+        
+        if (FruitBox.Instance.GetFruitNumber() == 0)
+        {
+            var failNotice = PoolingManager.Spawn(GameManager.Instance.failNotice, transform.transform.position, Quaternion.identity);
+            failNotice.ShowNotice("There is no suitable Object in the Box");
+            FruitBox.Instance.isUpgradingFruit = false;
+            StartCoroutine(DeactiveBlockClick());
+            return;
+        }
+        
+        FruitBox.Instance.ShowFruitsTarget();
     }
 
     private void ShakeBoost()
     {
-        SetCanvasSortingLayer("Shake");
+        if (FruitBox.Instance.GetFruitNumber() < 2)
+        {
+            var failNotice = PoolingManager.Spawn(GameManager.Instance.failNotice, transform.transform.position, Quaternion.identity);
+            failNotice.ShowNotice("There is no suitable Object in the Box");
+            return;
+        }
+        
+        var boostNumber = PlayerPrefs.GetInt(DataKey.ShakeBoost);
+        
+        if (boostNumber == 0)
+        {
+            shakeBoostPanel.gameObject.SetActive(true);
+            return;
+        }
+        
+        EventDispatcher.Instance.PostEvent(EventID.On_Use_Shake_Boost);
+    }
+
+    private void HanldeShakeBoost(object param)
+    {
         blockClick.gameObject.SetActive(true);
+        
+        if (FruitBox.Instance.GetFruitNumber() < 2)
+        {
+            var failNotice = PoolingManager.Spawn(GameManager.Instance.failNotice, transform.transform.position, Quaternion.identity);
+            failNotice.ShowNotice("There is no suitable Object in the Box");
+            FruitBox.Instance.isUpgradingFruit = false;
+            blockClick.gameObject.SetActive(false);
+            StartCoroutine(DeactiveBlockClick());
+            return;
+        }
+        
+        SetCanvasSortingLayer("Shake");
         StartCoroutine(FruitBox.Instance.ShakeBox());
     }
 
@@ -152,5 +309,16 @@ public class UIManager : Singleton<UIManager>
     private void ShowEndPanel(object param)
     {
         StartCoroutine(ShowImg());
+    }
+
+    public void PostEventDelay(EventID eventID)
+    {
+        StartCoroutine(PostEventDelayRoutine(eventID));
+    }
+    
+    private IEnumerator PostEventDelayRoutine(EventID eventID)
+    {
+        yield return new WaitForSeconds(0.5f);
+        EventDispatcher.Instance.PostEvent(eventID);
     }
 }
