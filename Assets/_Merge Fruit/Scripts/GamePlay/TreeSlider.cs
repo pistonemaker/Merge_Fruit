@@ -6,11 +6,12 @@ using UnityEngine.EventSystems;
 public class TreeSlider : Singleton<TreeSlider>
 {
     public Transform spawnPos;
+    public Transform lines;
     public Fruit curFruit;
     public bool isholding = false;
     public bool canhold = true;
     private float firstSpawnPosY;
-    private float bound = 2.25f;
+    private float bound = 2.20f;
     
     private void Start()
     {
@@ -38,6 +39,7 @@ public class TreeSlider : Singleton<TreeSlider>
 
     private IEnumerator DetachFruit()
     {
+        lines.gameObject.SetActive(false);
         FruitBox.Instance.AddFruit(curFruit);
         canhold = false;
         curFruit.coll.isTrigger = false;
@@ -46,12 +48,15 @@ public class TreeSlider : Singleton<TreeSlider>
         yield return new WaitForSeconds(0.5f);
         curFruit = PoolingManager.Spawn(GameManager.Instance.GetRandomFruit(), transform.position, 
             Quaternion.identity);
+        lines.gameObject.SetActive(true);
         AttachFruit();
         canhold = true;
     }
 
     private void Update()
     {
+        lines.position = new Vector3(transform.position.x, lines.position.y, transform.position.z);
+        
         if (FruitBox.Instance.isRemovingFruit || FruitBox.Instance.isUpgradingFruit)
         {
             return;

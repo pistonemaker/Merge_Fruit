@@ -1,3 +1,5 @@
+using System.Collections;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 
@@ -24,6 +26,7 @@ public class ScoreManager : MonoBehaviour
 
     private void UpdateScore(int scoreAdd)
     {
+        ZoomAnim();
         curScore += scoreAdd;
         scoreText.text = curScore.ToString();
         
@@ -33,5 +36,14 @@ public class ScoreManager : MonoBehaviour
             highestScoreText.text = highestScore.ToString();
             PlayerPrefs.SetInt("HighestScore", highestScore);
         }
+    }
+
+    private void ZoomAnim()
+    {
+        var scale = Vector3.one;
+        transform.DOScale(scale * 1.2f, 0.25f).OnComplete(() =>
+        {
+            transform.DOScale(scale, 0.25f);
+        });
     }
 }

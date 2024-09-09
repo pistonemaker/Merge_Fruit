@@ -1,3 +1,4 @@
+using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class GameManager : Singleton<GameManager>
@@ -5,11 +6,28 @@ public class GameManager : Singleton<GameManager>
     public GameData data;
     public MergeFx mergeFx;
     public FailNotice failNotice;
+    public Boom boom;
+    public BoomExplosion boomExplosion;
     private int nextID;
 
     private void OnEnable()
     {
+        Application.targetFrameRate = 60;
         SetID();
+    }
+
+    public void CheckIfPlayerPlayFirstTime()
+    {
+        if (!DataKey.IsPlayerPlayFirstTime())
+        {
+            return;
+        }
+        
+        PlayerPrefs.SetInt(DataKey.IsPlayingFirstTime, 1);
+        PlayerPrefs.SetInt(DataKey.RemoveBoost, 1);
+        PlayerPrefs.SetInt(DataKey.BoomBoost, 1);
+        PlayerPrefs.SetInt(DataKey.UpgradeBoost, 1);
+        PlayerPrefs.SetInt(DataKey.ShakeBoost, 1);
     }
 
     private void SetID()

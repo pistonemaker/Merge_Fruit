@@ -5,6 +5,7 @@ public static class DataKey
     #region int
 
     public const string HighestScore = "HighestScore";
+    public const string IsPlayingFirstTime = "IsPlayingFirstTime";
     public const string Use_Vibrate = "Use_Vibrate";
     public const string Use_Music = "Use_Music";
     public const string Use_SFX = "Use_Sound";
@@ -20,16 +21,21 @@ public static class DataKey
 
     public static bool IsUseMusic()
     {
-        return PlayerPrefs.GetInt(Use_Music) == 1; 
+        return PlayerPrefs.GetInt(Use_Music) == 0; 
     }
     
     public static bool IsUseVibrate()
     {
-        return PlayerPrefs.GetInt(Use_Vibrate) == 1; 
+        return PlayerPrefs.GetInt(Use_Vibrate) == 0; 
     }
     
     public static bool IsUseSound()
     {
-        return PlayerPrefs.GetInt(Use_SFX) == 1; 
+        return PlayerPrefs.GetInt(Use_SFX) == 0; 
+    }
+
+    public static bool IsPlayerPlayFirstTime()
+    {
+        return PlayerPrefs.GetInt(IsPlayingFirstTime, 0) == 0;
     }
 }

@@ -31,7 +31,7 @@ public class UpgradeBoostPanel : BasePanel
             ticketCount--;
             PlayerPrefs.SetInt("Ticket", ticketCount);
             ticket.ticketText.text = ticketCount.ToString();
-            UIManager.Instance.PostEventDelay(EventID.On_Use_Upgrade_Boost);
+            UIManager.Instance.PostEventDelay(EventID.On_Use_Upgrade_Boost_By_Ticket);
             ClosePanel();
         }
     }

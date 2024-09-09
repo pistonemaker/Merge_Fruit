@@ -25,13 +25,13 @@ public class RemoveBoostPanel : BasePanel
 
     private void BuyBooster()
     {
-        int ticketCount = PlayerPrefs.GetInt("Ticket");
+        int ticketCount = PlayerPrefs.GetInt(DataKey.Ticket);
         if (ticketCount >= 1)
         {
             ticketCount--;
-            PlayerPrefs.SetInt("Ticket", ticketCount);
+            PlayerPrefs.SetInt(DataKey.Ticket, ticketCount);
             ticket.ticketText.text = ticketCount.ToString();
-            UIManager.Instance.PostEventDelay(EventID.On_Use_Remove_Boost);
+            UIManager.Instance.PostEventDelay(EventID.On_Use_Remove_Boost_By_Ticket);
             ClosePanel();
         }
     }

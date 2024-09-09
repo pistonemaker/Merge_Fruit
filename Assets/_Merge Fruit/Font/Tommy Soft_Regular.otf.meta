@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: e23dc21023464d3cb3f676d487f3ae77
+timeCreated: 1725443184
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: "Tommy Soft_Regular"
+  fontNames:
+  - MADE Tommy Soft
+  fallbackFontReferences: []
+  customCharacters:
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData:
+  assetBundleName: 
+  assetBundleVariant: 

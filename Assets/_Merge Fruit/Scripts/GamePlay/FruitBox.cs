@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
@@ -64,18 +65,16 @@ public class FruitBox : Singleton<FruitBox>
     public bool HasSuitableFruit()
     {
         bool hasSuitableFruit = false;
-        
+
         for (int i = 0; i < fruits.Count; i++)
         {
             if (fruits[i].id == 0 || fruits[i].id == 1)
             {
-                PoolingManager.Despawn(fruits[i].gameObject);
-                RemoveFruit(fruits[i]);
                 hasSuitableFruit = true;
                 break;
             }
         }
-        
+
         return hasSuitableFruit;
     }
 
@@ -111,22 +110,32 @@ public class FruitBox : Singleton<FruitBox>
                 if (hits[i].collider.CompareTag("Fruit") && !hits[i].collider.isTrigger)
                 {
                     var fruit = hits[i].collider.GetComponent<Fruit>();
-                    OnBoomExplode(fruit);
+                    var boom = GameManager.Instance.boom;
+                    boom.gameObject.SetActive(true);
+                    boom.ActiveBoom(fruit.transform, () =>
+                    {
+                        var boomExplode = GameManager.Instance.boomExplosion;
+                        boomExplode.gameObject.SetActive(true);
+                        boomExplode.transform.position = fruit.transform.position;
+                        boomExplode.Explode(() =>
+                        {
+                            PoolingManager.Despawn(fruit.gameObject);
+                            RemoveFruit(fruit);
+                            StartCoroutine(UIManager.Instance.DeactiveBlockClick());
+                            HideFruitsTarget();
+                            isRemovingFruit = false;
+                            UIManager.Instance.UITop.SetActive(true);
+                            TreeSlider.Instance.lines.gameObject.SetActive(true);
+                            TreeSlider.Instance.gameObject.SetActive(true);
+                            BoosterSignpost.Instance.gameObject.SetActive(false);
+                        });
+                    });
                     break;
                 }
             }
         }
     }
-
-    private void OnBoomExplode(Fruit fruit)
-    {
-        PoolingManager.Despawn(fruit.gameObject);
-        RemoveFruit(fruit);
-        StartCoroutine(UIManager.Instance.DeactiveBlockClick());
-        HideFruitsTarget();
-        isRemovingFruit = false;
-    }
-
+    
     public void UpgradeFruit()
     {
         if (!isUpgradingFruit)
@@ -151,17 +160,21 @@ public class FruitBox : Singleton<FruitBox>
                     var newFruit = PoolingManager.Spawn(GameManager.Instance.data.fruitDatas[id + 1].fruitPrefab,
                         pos, Quaternion.identity);
                     newFruit.rb.gravityScale = 1f;
-                    
+
                     var mergeFx1 = PoolingManager.Spawn(GameManager.Instance.mergeFx, newFruit.transform.position, Quaternion.identity);
                     mergeFx1.ShowMergeFx(newFruit.id);
                     var mergeFx2 = PoolingManager.Spawn(GameManager.Instance.mergeFx, newFruit.transform.position, Quaternion.identity);
                     mergeFx2.transform.Rotate(new Vector3(0f, 0f, -135f));
                     mergeFx2.ShowMergeFx(newFruit.id);
-                    
+
                     AddFruit(newFruit);
                     StartCoroutine(UIManager.Instance.DeactiveBlockClick());
                     HideFruitsTarget();
                     isUpgradingFruit = false;
+                    UIManager.Instance.UITop.SetActive(true);
+                    TreeSlider.Instance.lines.gameObject.SetActive(true);
+                    TreeSlider.Instance.gameObject.SetActive(true);
+                    BoosterSignpost.Instance.gameObject.SetActive(false);
                     return;
                 }
             }
@@ -176,6 +189,7 @@ public class FruitBox : Singleton<FruitBox>
 
     public IEnumerator ShakeBox()
     {
+        TreeSlider.Instance.lines.gameObject.SetActive(false);
         TreeSlider.Instance.gameObject.SetActive(false);
         Camera mainCamera = Camera.main;
         float shakeDuration = 2f;
@@ -201,7 +215,8 @@ public class FruitBox : Singleton<FruitBox>
                     {
                         StartCoroutine(UIManager.Instance.DeactiveBlockClick());
                         TreeSlider.Instance.gameObject.SetActive(true);
-                        UIManager.Instance.SetCanvasSortingLayer("Default");
+                        TreeSlider.Instance.lines.gameObject.SetActive(true);
+                        UIManager.Instance.SetCanvasSortingLayer("UI");
                     });
                 });
             sequence.Join(rotationSequence);

@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -25,10 +24,12 @@ public class UIManager : Singleton<UIManager>
     public BoomBoostPanel boomBoostPanel;
     public UpgradeBoostPanel upgradeBoostPanel;
     public ShakeBoostPanel shakeBoostPanel;
+    public GameObject UITop;
 
     private void OnEnable()
     {
         canvas = GetComponent<Canvas>();
+        UITop = transform.Find("UI Top").gameObject;
         blockClick.gameObject.SetActive(false);
         this.RegisterListener(EventID.On_Show_Next_Fruit, param => ShowNextFruit((int)param));
         EventDispatcher.Instance.RegisterListener(EventID.On_Player_Dead, ShowEndPanel);
@@ -61,15 +62,18 @@ public class UIManager : Singleton<UIManager>
 
     private void RegisterBoosterListener()
     {
-        EventDispatcher.Instance.RegisterListener(EventID.On_Use_Remove_Boost, HandleRemoveBoost);
-        EventDispatcher.Instance.RegisterListener(EventID.On_Use_Boom_Boost, HandleBoomBoost);
-        EventDispatcher.Instance.RegisterListener(EventID.On_Use_Upgrade_Boost, HandleUpgradeBoost);
-        EventDispatcher.Instance.RegisterListener(EventID.On_Use_Shake_Boost, HanldeShakeBoost);
+        EventDispatcher.Instance.RegisterListener(EventID.On_Use_Remove_Boost_By_Ticket, HandleRemoveBoost);
+        EventDispatcher.Instance.RegisterListener(EventID.On_Use_Boom_Boost_By_Ticket, HandleBoomBoost);
+        EventDispatcher.Instance.RegisterListener(EventID.On_Use_Upgrade_Boost_By_Ticket, HandleUpgradeBoost);
+        EventDispatcher.Instance.RegisterListener(EventID.On_Use_Shake_Boost_By_Ticket, HanldeShakeBoost);
     }
     
     private void RemoveBoosterListener()
     {
-        
+        EventDispatcher.Instance.RemoveListener(EventID.On_Use_Remove_Boost_By_Ticket, HandleRemoveBoost);
+        EventDispatcher.Instance.RemoveListener(EventID.On_Use_Boom_Boost_By_Ticket, HandleBoomBoost);
+        EventDispatcher.Instance.RemoveListener(EventID.On_Use_Upgrade_Boost_By_Ticket, HandleUpgradeBoost);
+        EventDispatcher.Instance.RemoveListener(EventID.On_Use_Shake_Boost_By_Ticket, HanldeShakeBoost);
     }
     
     private void ShowNextFruit(int id)
@@ -91,6 +95,7 @@ public class UIManager : Singleton<UIManager>
         }
         
         var boostNumber = PlayerPrefs.GetInt(DataKey.RemoveBoost);
+        Debug.Log(boostNumber);
         
         if (boostNumber == 0)
         {
@@ -98,7 +103,7 @@ public class UIManager : Singleton<UIManager>
             return;
         }
         
-        EventDispatcher.Instance.PostEvent(EventID.On_Use_Remove_Boost);
+        EventDispatcher.Instance.PostEvent(EventID.On_Use_Remove_Boost_By_Ticket);
     }
 
     private void HandleRemoveBoost(object param)
@@ -113,6 +118,7 @@ public class UIManager : Singleton<UIManager>
             return;
         }
         
+        EventDispatcher.Instance.PostEvent(EventID.On_Use_Remove_Boost, DataKey.RemoveBoost);
         FruitBox.Instance.RemoveSmallestFruit();
     }
 
@@ -126,14 +132,14 @@ public class UIManager : Singleton<UIManager>
         }
         
         var boostNumber = PlayerPrefs.GetInt(DataKey.BoomBoost);
-        
+        Debug.Log(boostNumber);
         if (boostNumber == 0)
         {
             boomBoostPanel.gameObject.SetActive(true);
             return;
         }
         
-        EventDispatcher.Instance.PostEvent(EventID.On_Use_Boom_Boost);
+        EventDispatcher.Instance.PostEvent(EventID.On_Use_Boom_Boost_By_Ticket);
     }
 
     private void HandleBoomBoost(object param)
@@ -150,6 +156,11 @@ public class UIManager : Singleton<UIManager>
             return;
         }
         
+        TreeSlider.Instance.lines.gameObject.SetActive(false);
+        TreeSlider.Instance.gameObject.SetActive(false);
+        UITop.SetActive(false);
+        BoosterSignpost.Instance.ShowSignpost("Tap to remove a Fruit from the box");
+        EventDispatcher.Instance.PostEvent(EventID.On_Use_Boom_Boost, DataKey.BoomBoost);
         FruitBox.Instance.ShowFruitsTarget();
     }
 
@@ -170,7 +181,7 @@ public class UIManager : Singleton<UIManager>
             return;
         }
         
-        EventDispatcher.Instance.PostEvent(EventID.On_Use_Upgrade_Boost);
+        EventDispatcher.Instance.PostEvent(EventID.On_Use_Upgrade_Boost_By_Ticket);
     }
 
     private void HandleUpgradeBoost(object param)
@@ -187,6 +198,11 @@ public class UIManager : Singleton<UIManager>
             return;
         }
         
+        TreeSlider.Instance.lines.gameObject.SetActive(false);
+        TreeSlider.Instance.gameObject.SetActive(false);
+        UITop.SetActive(false);
+        BoosterSignpost.Instance.ShowSignpost("Tap to upgrade a Fruit in the box");
+        EventDispatcher.Instance.PostEvent(EventID.On_Use_Upgrade_Boost, DataKey.UpgradeBoost);
         FruitBox.Instance.ShowFruitsTarget();
     }
 
@@ -207,7 +223,7 @@ public class UIManager : Singleton<UIManager>
             return;
         }
         
-        EventDispatcher.Instance.PostEvent(EventID.On_Use_Shake_Boost);
+        EventDispatcher.Instance.PostEvent(EventID.On_Use_Shake_Boost_By_Ticket);
     }
 
     private void HanldeShakeBoost(object param)
@@ -224,6 +240,7 @@ public class UIManager : Singleton<UIManager>
             return;
         }
         
+        EventDispatcher.Instance.PostEvent(EventID.On_Use_Shake_Boost, DataKey.ShakeBoost);
         SetCanvasSortingLayer("Shake");
         StartCoroutine(FruitBox.Instance.ShakeBox());
     }

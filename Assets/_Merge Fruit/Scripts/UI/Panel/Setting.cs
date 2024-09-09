@@ -10,6 +10,9 @@ public class Setting : BasePanel
     public Button restartButton;
     public Button continueButton;
 
+    public Image soundImage;
+    public Image vibrateImage;
+    public Image musicImage;
     public Sprite sound;
     public Sprite nonSound;
     public Sprite vibrate;
@@ -33,32 +36,32 @@ public class Setting : BasePanel
     {
         if (DataKey.IsUseVibrate())
         {
-            vibrateButton.image.sprite = vibrate;
+            vibrateImage.sprite = vibrate;
         }
         else
         {
-            vibrateButton.image.sprite = nonVibrate;
+            vibrateImage.sprite = nonVibrate;
         }
         
         if (DataKey.IsUseMusic())
         {
-            musicButton.image.sprite = music;
+            musicImage.sprite = music;
             AudioManager.Instance.ToggleMusic(false);
         }
         else
         {
-            musicButton.image.sprite = nonMusic;
+            musicImage.sprite = nonMusic;
             AudioManager.Instance.ToggleMusic(true);
         }
         
         if (DataKey.IsUseSound())
         {
-            soundButton.image.sprite = sound;
+            soundImage.sprite = sound;
             AudioManager.Instance.ToggleSFX(false);
         }
         else
         {
-            soundButton.image.sprite = nonSound;
+            soundImage.sprite = nonSound;
             AudioManager.Instance.ToggleSFX(true);
         }
     }
@@ -67,14 +70,14 @@ public class Setting : BasePanel
     {
         vibrateButton.onClick.AddListener(() =>
         {
-            if (vibrateButton.image.sprite == vibrate)
+            if (vibrateImage.sprite == vibrate)
             {
-                vibrateButton.image.sprite = nonVibrate;
+                vibrateImage.sprite = nonVibrate;
                 PlayerPrefs.SetInt(DataKey.Use_Vibrate, 0);
             }
-            else if (vibrateButton.image.sprite == nonVibrate)
+            else if (vibrateImage.sprite == nonVibrate)
             {
-                vibrateButton.image.sprite = vibrate;
+                vibrateImage.sprite = vibrate;
                 
                 PlayerPrefs.SetInt(DataKey.Use_Vibrate, 1);
             }
@@ -82,16 +85,16 @@ public class Setting : BasePanel
         
         musicButton.onClick.AddListener(() =>
         {
-            if (musicButton.image.sprite == music)
+            if (musicImage.sprite == music)
             {
-                musicButton.image.sprite = nonMusic;
+                musicImage.sprite = nonMusic;
                 PlayerPrefs.SetInt(DataKey.Use_Music, 0);
                 AudioManager.Instance.ToggleMusic(true);
                 AudioManager.Instance.ToggleSFX(true);
             }
-            else if (musicButton.image.sprite == nonMusic)
+            else if (musicImage.sprite == nonMusic)
             {
-                musicButton.image.sprite = music;
+                musicImage.sprite = music;
                 PlayerPrefs.SetInt(DataKey.Use_Music, 1);
                 AudioManager.Instance.ToggleMusic(false);
                 AudioManager.Instance.ToggleSFX(false);
@@ -100,16 +103,16 @@ public class Setting : BasePanel
         
         soundButton.onClick.AddListener(() =>
         {
-            if (soundButton.image.sprite == sound)
+            if (soundImage.sprite == sound)
             {
-                soundButton.image.sprite = nonSound;
+                soundImage.sprite = nonSound;
                 PlayerPrefs.SetInt(DataKey.Use_SFX, 0);
                 AudioManager.Instance.ToggleMusic(true);
                 AudioManager.Instance.ToggleSFX(true);
             }
-            else if (soundButton.image.sprite == nonSound)
+            else if (soundImage.sprite == nonSound)
             {
-                soundButton.image.sprite = sound;
+                soundImage.sprite = sound;
                 PlayerPrefs.SetInt(DataKey.Use_SFX, 1);
                 AudioManager.Instance.ToggleMusic(false);
                 AudioManager.Instance.ToggleSFX(false);
