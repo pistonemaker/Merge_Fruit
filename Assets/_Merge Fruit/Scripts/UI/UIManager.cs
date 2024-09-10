@@ -341,19 +341,18 @@ public class UIManager : Singleton<UIManager>
         yield return new WaitForSeconds(0.5f);
         EventDispatcher.Instance.PostEvent(eventID);
     }
-    
+
     public void CaptureFullScreenAndShowOnEndPanel()
     {
         captureCam.gameObject.SetActive(true);
-
         int screenWidth = Screen.currentResolution.width;
         int screenHeight = Screen.currentResolution.height;
-        Debug.Log("Width: " + screenWidth + "   Height:" + screenHeight);
-        int renderTextureWidth = screenWidth; 
+        //Debug.Log("Width: " + screenWidth + "   Height:" + screenHeight);
+        int renderTextureWidth = screenWidth;
         int renderTextureHeight = screenHeight;
 
         RenderTexture rt = new RenderTexture(renderTextureWidth, renderTextureHeight, 24);
-        rt.antiAliasing = 8;  
+        rt.antiAliasing = 8;
         captureCam.targetTexture = rt;
         captureCam.Render();
 
@@ -366,9 +365,9 @@ public class UIManager : Singleton<UIManager>
         RenderTexture.active = null;
         Destroy(rt);
 
-        Sprite screenshotSprite = Sprite.Create(screenshot, new Rect(0, 0, screenshot.width, screenshot.height), 
+        Sprite screenshotSprite = Sprite.Create(screenshot, new Rect(0, 0, screenshot.width, screenshot.height),
             new Vector2(0.5f, 0.5f));
-    
+
         SetCanvasSortingLayer("UI");
         captureCam.gameObject.SetActive(false);
         endPanel.endImage.sprite = screenshotSprite;
@@ -376,22 +375,15 @@ public class UIManager : Singleton<UIManager>
         ScaleImageToResolution(endPanel.endImage);
         endPanel.gameObject.SetActive(true);
         endPanel.scoreText.text = "Score: " + ScoreManager.Instance.curScore;
-
-        // Bước 6: Lưu ảnh vào ổ cứng
-        byte[] bytes = screenshot.EncodeToPNG();  // Mã hoá Texture2D thành PNG
-        string filePath = Application.persistentDataPath + "/Screenshot_" + System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + ".png";
-        System.IO.File.WriteAllBytes(filePath, bytes);
-    
-        Debug.Log("Screenshot saved to: " + filePath);
     }
-    
+
     public void ScaleImageToResolution(Image originalImage, int targetWidth = 750, int targetHeight = 1334)
     {
         int originalWidth = Screen.currentResolution.width;
         int originalHeight = Screen.currentResolution.height;
 
-        float scaleX = 0.7f*(float)targetWidth / originalWidth;
-        float scaleY = 0.7f*(float)targetHeight / originalHeight;
+        float scaleX = 0.65f * (float)targetWidth / originalWidth;
+        float scaleY = 0.65f * (float)targetHeight / originalHeight;
 
         Vector2 newScale = new Vector2(scaleX, scaleY);
 
