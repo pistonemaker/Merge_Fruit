@@ -9,14 +9,15 @@ public class UIManager : Singleton<UIManager>
     public Canvas canvas;
     public Image nextFruit;
     public Image blockClick;
+    public Image blockClickMask;
     public List<Sprite> fruitSprites;
-    
+
     public Button removeBoostButton;
     public Button boomBoostButton;
     public Button upgradeBoostButton;
     public Button shakeBoostButton;
     public Button settingButton;
-    
+
     public Camera captureCam;
     public EndPanel endPanel;
     public Setting setting;
@@ -31,15 +32,16 @@ public class UIManager : Singleton<UIManager>
         canvas = GetComponent<Canvas>();
         UITop = transform.Find("UI Top").gameObject;
         blockClick.gameObject.SetActive(false);
+        blockClickMask.gameObject.SetActive(false);
         this.RegisterListener(EventID.On_Show_Next_Fruit, param => ShowNextFruit((int)param));
         EventDispatcher.Instance.RegisterListener(EventID.On_Player_Dead, ShowEndPanel);
         RegisterBoosterListener();
-        
+
         removeBoostButton.onClick.AddListener(RemoveBoost);
         boomBoostButton.onClick.AddListener(BoomBoost);
         upgradeBoostButton.onClick.AddListener(UpgradeBoost);
         shakeBoostButton.onClick.AddListener(ShakeBoost);
-        
+
         settingButton.onClick.AddListener(() =>
         {
             blockClick.gameObject.SetActive(true);
@@ -52,7 +54,6 @@ public class UIManager : Singleton<UIManager>
         this.RemoveListener(EventID.On_Show_Next_Fruit, param => ShowNextFruit((int)param));
         EventDispatcher.Instance.RemoveListener(EventID.On_Player_Dead, ShowEndPanel);
         RemoveBoosterListener();
-            
         removeBoostButton.onClick.RemoveAllListeners();
         boomBoostButton.onClick.RemoveAllListeners();
         upgradeBoostButton.onClick.RemoveAllListeners();
@@ -67,7 +68,7 @@ public class UIManager : Singleton<UIManager>
         EventDispatcher.Instance.RegisterListener(EventID.On_Use_Upgrade_Boost_By_Ticket, HandleUpgradeBoost);
         EventDispatcher.Instance.RegisterListener(EventID.On_Use_Shake_Boost_By_Ticket, HanldeShakeBoost);
     }
-    
+
     private void RemoveBoosterListener()
     {
         EventDispatcher.Instance.RemoveListener(EventID.On_Use_Remove_Boost_By_Ticket, HandleRemoveBoost);
@@ -75,7 +76,7 @@ public class UIManager : Singleton<UIManager>
         EventDispatcher.Instance.RemoveListener(EventID.On_Use_Upgrade_Boost_By_Ticket, HandleUpgradeBoost);
         EventDispatcher.Instance.RemoveListener(EventID.On_Use_Shake_Boost_By_Ticket, HanldeShakeBoost);
     }
-    
+
     private void ShowNextFruit(int id)
     {
         nextFruit.transform.localScale = Vector3.zero;
@@ -86,23 +87,23 @@ public class UIManager : Singleton<UIManager>
     private void RemoveBoost()
     {
         var canUse = FruitBox.Instance.HasSuitableFruit();
-        
+
         if (!canUse)
         {
             var failNotice = PoolingManager.Spawn(GameManager.Instance.failNotice, transform.transform.position, Quaternion.identity);
             failNotice.ShowNotice("There is no suitable Object in the Box");
             return;
         }
-        
+
         var boostNumber = PlayerPrefs.GetInt(DataKey.RemoveBoost);
         Debug.Log(boostNumber);
-        
+
         if (boostNumber == 0)
         {
             removeBoostPanel.gameObject.SetActive(true);
             return;
         }
-        
+
         EventDispatcher.Instance.PostEvent(EventID.On_Use_Remove_Boost_By_Ticket);
     }
 
@@ -117,7 +118,7 @@ public class UIManager : Singleton<UIManager>
             blockClick.gameObject.SetActive(false);
             return;
         }
-        
+
         EventDispatcher.Instance.PostEvent(EventID.On_Use_Remove_Boost, DataKey.RemoveBoost);
         FruitBox.Instance.RemoveSmallestFruit();
     }
@@ -130,7 +131,7 @@ public class UIManager : Singleton<UIManager>
             failNotice.ShowNotice("There is no suitable Object in the Box");
             return;
         }
-        
+
         var boostNumber = PlayerPrefs.GetInt(DataKey.BoomBoost);
         Debug.Log(boostNumber);
         if (boostNumber == 0)
@@ -138,7 +139,7 @@ public class UIManager : Singleton<UIManager>
             boomBoostPanel.gameObject.SetActive(true);
             return;
         }
-        
+
         EventDispatcher.Instance.PostEvent(EventID.On_Use_Boom_Boost_By_Ticket);
     }
 
@@ -146,7 +147,7 @@ public class UIManager : Singleton<UIManager>
     {
         blockClick.gameObject.SetActive(true);
         FruitBox.Instance.isRemovingFruit = true;
-        
+
         if (FruitBox.Instance.GetFruitNumber() == 0)
         {
             var failNotice = PoolingManager.Spawn(GameManager.Instance.failNotice, transform.transform.position, Quaternion.identity);
@@ -155,7 +156,7 @@ public class UIManager : Singleton<UIManager>
             StartCoroutine(DeactiveBlockClick());
             return;
         }
-        
+
         TreeSlider.Instance.lines.gameObject.SetActive(false);
         TreeSlider.Instance.gameObject.SetActive(false);
         UITop.SetActive(false);
@@ -172,15 +173,15 @@ public class UIManager : Singleton<UIManager>
             failNotice.ShowNotice("There is no suitable Object in the Box");
             return;
         }
-        
+
         var boostNumber = PlayerPrefs.GetInt(DataKey.UpgradeBoost);
-        
+
         if (boostNumber == 0)
         {
             upgradeBoostPanel.gameObject.SetActive(true);
             return;
         }
-        
+
         EventDispatcher.Instance.PostEvent(EventID.On_Use_Upgrade_Boost_By_Ticket);
     }
 
@@ -188,7 +189,7 @@ public class UIManager : Singleton<UIManager>
     {
         blockClick.gameObject.SetActive(true);
         FruitBox.Instance.isUpgradingFruit = true;
-        
+
         if (FruitBox.Instance.GetFruitNumber() == 0)
         {
             var failNotice = PoolingManager.Spawn(GameManager.Instance.failNotice, transform.transform.position, Quaternion.identity);
@@ -197,7 +198,7 @@ public class UIManager : Singleton<UIManager>
             StartCoroutine(DeactiveBlockClick());
             return;
         }
-        
+
         TreeSlider.Instance.lines.gameObject.SetActive(false);
         TreeSlider.Instance.gameObject.SetActive(false);
         UITop.SetActive(false);
@@ -214,22 +215,22 @@ public class UIManager : Singleton<UIManager>
             failNotice.ShowNotice("There is no suitable Object in the Box");
             return;
         }
-        
+
         var boostNumber = PlayerPrefs.GetInt(DataKey.ShakeBoost);
-        
+
         if (boostNumber == 0)
         {
             shakeBoostPanel.gameObject.SetActive(true);
             return;
         }
-        
+
         EventDispatcher.Instance.PostEvent(EventID.On_Use_Shake_Boost_By_Ticket);
     }
 
     private void HanldeShakeBoost(object param)
     {
         blockClick.gameObject.SetActive(true);
-        
+
         if (FruitBox.Instance.GetFruitNumber() < 2)
         {
             var failNotice = PoolingManager.Spawn(GameManager.Instance.failNotice, transform.transform.position, Quaternion.identity);
@@ -239,7 +240,7 @@ public class UIManager : Singleton<UIManager>
             StartCoroutine(DeactiveBlockClick());
             return;
         }
-        
+
         EventDispatcher.Instance.PostEvent(EventID.On_Use_Shake_Boost, DataKey.ShakeBoost);
         SetCanvasSortingLayer("Shake");
         StartCoroutine(FruitBox.Instance.ShakeBox());
@@ -286,8 +287,8 @@ public class UIManager : Singleton<UIManager>
     private IEnumerator ShowImg()
     {
         yield return new WaitForSeconds(0.5f);
-        int cropWidth = Screen.width * 2; // Kích thước crop tuỳ chỉnh
-        int cropHeight = Screen.height;
+        int cropWidth = Screen.width * 2 - 100; // Kích thước crop tuỳ chỉnh
+        int cropHeight = Screen.height - 50;
 
         int renderTextureWidth = Screen.width * 2; // Kích thước của RenderTexture
         int renderTextureHeight = Screen.height * 2;
@@ -314,28 +315,86 @@ public class UIManager : Singleton<UIManager>
 
         // Tạo Sprite từ ảnh đã crop và hiển thị trên EndPanel
         Sprite screenshotSprite = Sprite.Create(croppedScreenshot,
-            new Rect(0, 0, croppedScreenshot.width, croppedScreenshot.height),
+            new Rect(0, 50, croppedScreenshot.width, croppedScreenshot.height - 50),
             new Vector2(0.5f, 0.5f));
 
         SetCanvasSortingLayer("UI");
         endPanel.endImage.sprite = screenshotSprite;
-        endPanel.gameObject.SetActive(true);    
+        endPanel.gameObject.SetActive(true);
+        endPanel.scoreText.text = "Score: " + ScoreManager.Instance.curScore;
         captureCam.gameObject.SetActive(false);
     }
 
     private void ShowEndPanel(object param)
     {
-        StartCoroutine(ShowImg());
+        //StartCoroutine(ShowImg());
+        CaptureFullScreenAndShowOnEndPanel();
     }
 
     public void PostEventDelay(EventID eventID)
     {
         StartCoroutine(PostEventDelayRoutine(eventID));
     }
-    
+
     private IEnumerator PostEventDelayRoutine(EventID eventID)
     {
         yield return new WaitForSeconds(0.5f);
         EventDispatcher.Instance.PostEvent(eventID);
+    }
+    
+    public void CaptureFullScreenAndShowOnEndPanel()
+    {
+        captureCam.gameObject.SetActive(true);
+
+        int screenWidth = Screen.currentResolution.width;
+        int screenHeight = Screen.currentResolution.height;
+        Debug.Log("Width: " + screenWidth + "   Height:" + screenHeight);
+        int renderTextureWidth = screenWidth; 
+        int renderTextureHeight = screenHeight;
+
+        RenderTexture rt = new RenderTexture(renderTextureWidth, renderTextureHeight, 24);
+        rt.antiAliasing = 8;  
+        captureCam.targetTexture = rt;
+        captureCam.Render();
+
+        RenderTexture.active = rt;
+        Texture2D screenshot = new Texture2D(renderTextureWidth, renderTextureHeight, TextureFormat.RGB24, false);
+        screenshot.ReadPixels(new Rect(0, 0, renderTextureWidth, renderTextureHeight), 0, 0);
+        screenshot.Apply();
+
+        captureCam.targetTexture = null;
+        RenderTexture.active = null;
+        Destroy(rt);
+
+        Sprite screenshotSprite = Sprite.Create(screenshot, new Rect(0, 0, screenshot.width, screenshot.height), 
+            new Vector2(0.5f, 0.5f));
+    
+        SetCanvasSortingLayer("UI");
+        captureCam.gameObject.SetActive(false);
+        endPanel.endImage.sprite = screenshotSprite;
+        endPanel.endImage.SetNativeSize();
+        ScaleImageToResolution(endPanel.endImage);
+        endPanel.gameObject.SetActive(true);
+        endPanel.scoreText.text = "Score: " + ScoreManager.Instance.curScore;
+
+        // Bước 6: Lưu ảnh vào ổ cứng
+        byte[] bytes = screenshot.EncodeToPNG();  // Mã hoá Texture2D thành PNG
+        string filePath = Application.persistentDataPath + "/Screenshot_" + System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + ".png";
+        System.IO.File.WriteAllBytes(filePath, bytes);
+    
+        Debug.Log("Screenshot saved to: " + filePath);
+    }
+    
+    public void ScaleImageToResolution(Image originalImage, int targetWidth = 750, int targetHeight = 1334)
+    {
+        int originalWidth = Screen.currentResolution.width;
+        int originalHeight = Screen.currentResolution.height;
+
+        float scaleX = 0.7f*(float)targetWidth / originalWidth;
+        float scaleY = 0.7f*(float)targetHeight / originalHeight;
+
+        Vector2 newScale = new Vector2(scaleX, scaleY);
+
+        originalImage.rectTransform.localScale = new Vector3(newScale.x, newScale.y, 1);
     }
 }

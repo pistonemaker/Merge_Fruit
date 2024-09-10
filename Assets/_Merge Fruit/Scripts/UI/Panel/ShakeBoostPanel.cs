@@ -10,6 +10,7 @@ public class ShakeBoostPanel : BasePanel
 
     private void OnEnable()
     {
+        UIManager.Instance.blockClickMask.gameObject.SetActive(true);
         OpenPanel();
         closeButton.onClick.AddListener(ClosePanel);
         buyButton.onClick.AddListener(BuyBooster);

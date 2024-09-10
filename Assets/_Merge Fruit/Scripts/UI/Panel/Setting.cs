@@ -29,6 +29,7 @@ public class Setting : BasePanel
 
     private void ShowBox()
     {
+        UIManager.Instance.blockClickMask.gameObject.SetActive(true);
         LoadBoxData();
     }
 

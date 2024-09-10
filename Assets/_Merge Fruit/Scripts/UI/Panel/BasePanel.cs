@@ -14,6 +14,7 @@ public class BasePanel : MonoBehaviour
 
     protected void ClosePanel()
     {
+        UIManager.Instance.blockClickMask.gameObject.SetActive(false);
         StartCoroutine(UIManager.Instance.DeactiveBlockClick());
         Sequence sequence = DOTween.Sequence();
         sequence.Append(transform.DOScale(1.05f, 0.15f).SetUpdate(true))

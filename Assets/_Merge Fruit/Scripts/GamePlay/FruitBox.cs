@@ -6,12 +6,14 @@ using UnityEngine;
 
 public class FruitBox : Singleton<FruitBox>
 {
+    public SpriteRenderer sr;
     [SerializeField] private List<Fruit> fruits;
     public bool isRemovingFruit = false;
     public bool isUpgradingFruit = false;
 
     private void OnEnable()
     {
+        sr = transform.GetChild(0).gameObject.GetComponent<SpriteRenderer>();
         EventDispatcher.Instance.RegisterListener(EventID.On_Player_Dead, ChangeFruitAnim);
     }
 
