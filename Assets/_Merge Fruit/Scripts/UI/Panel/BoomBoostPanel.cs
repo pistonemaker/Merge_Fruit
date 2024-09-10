@@ -38,6 +38,7 @@ public class BoomBoostPanel : BasePanel
 
     private void ShowAds()
     {
-        
+        UIManager.Instance.PostEventDelay(EventID.On_Use_Boom_Boost_By_Ticket);
+        ClosePanel();
     }
 }

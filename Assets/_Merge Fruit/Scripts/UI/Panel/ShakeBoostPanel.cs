@@ -38,6 +38,7 @@ public class ShakeBoostPanel : BasePanel
 
     private void ShowAds()
     {
-        
+        UIManager.Instance.PostEventDelay(EventID.On_Use_Shake_Boost_By_Ticket);
+        ClosePanel();
     }
 }

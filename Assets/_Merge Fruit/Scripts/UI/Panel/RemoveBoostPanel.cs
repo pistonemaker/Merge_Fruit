@@ -35,11 +35,10 @@ public class RemoveBoostPanel : BasePanel
             ClosePanel();
         }
     }
-    
-    
 
     private void ShowAds()
     {
-        
+        UIManager.Instance.PostEventDelay(EventID.On_Use_Remove_Boost_By_Ticket);
+        ClosePanel();
     }
 }

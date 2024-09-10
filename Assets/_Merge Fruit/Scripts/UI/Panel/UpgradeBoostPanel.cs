@@ -38,6 +38,7 @@ public class UpgradeBoostPanel : BasePanel
 
     private void ShowAds()
     {
-        
+        UIManager.Instance.PostEventDelay(EventID.On_Use_Upgrade_Boost_By_Ticket);
+        ClosePanel();
     }
 }

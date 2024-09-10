@@ -44,6 +44,16 @@ public class TreeSlider : Singleton<TreeSlider>
         canhold = false;
         curFruit.coll.isTrigger = false;
         curFruit.transform.SetParent(null);
+        
+        if (curFruit.transform.position.x > bound)
+        {
+            curFruit.transform.position = new Vector3(bound, curFruit.transform.position.y, curFruit.transform.position.z);
+        }
+        if (curFruit.transform.position.x < -bound)
+        {
+            curFruit.transform.position = new Vector3(-bound, curFruit.transform.position.y, curFruit.transform.position.z);
+        }
+        
         curFruit.Fall();
         yield return new WaitForSeconds(0.5f);
         curFruit = PoolingManager.Spawn(GameManager.Instance.GetRandomFruit(), transform.position, 
