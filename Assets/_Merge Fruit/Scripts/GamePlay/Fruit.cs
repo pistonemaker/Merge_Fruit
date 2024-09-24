@@ -59,6 +59,7 @@ public class Fruit : MonoBehaviour
         var newFruit = PoolingManager.Spawn(GameManager.Instance.data.fruitDatas[newId].fruitPrefab,
             collisionPosition, Quaternion.identity);
         
+        AudioManager.Instance.PlaySFX("Merge");
         var mergeFx1 = PoolingManager.Spawn(GameManager.Instance.mergeFx, newFruit.transform.position, Quaternion.identity);
         mergeFx1.ShowMergeFx(newFruit.id);
         var mergeFx2 = PoolingManager.Spawn(GameManager.Instance.mergeFx, newFruit.transform.position, Quaternion.identity);

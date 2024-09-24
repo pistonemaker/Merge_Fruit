@@ -24,15 +24,17 @@ public class ButtonScaler : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
     public void OnPointerDown(PointerEventData eventData)
     {
         transform.DOKill();
-        transform.DOScale(scale, 0.25f).SetUpdate(true);
+        transform.DOScale(scale, 0.15f).SetUpdate(true);
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
         Sequence sequence = DOTween.Sequence();
-        sequence.Append(transform.DOScale(1.05f, 0.15f).SetUpdate(true))
-            .Append(transform.DOScale(0.95f, 0.1f).SetUpdate(true))
-            .Append(transform.DOScale(1f, 0.1f).SetUpdate(true));
+        sequence.Append(transform.DOScale(1.05f, 0.1f).SetUpdate(true))
+            .Append(transform.DOScale(0.95f, 0.05f).SetUpdate(true))
+            .Append(transform.DOScale(1f, 0.05f).SetUpdate(true));
+        
+        AudioManager.Instance.PlaySFX("Button_Click");
     }
 
     private IEnumerator BlockContinuousClick()

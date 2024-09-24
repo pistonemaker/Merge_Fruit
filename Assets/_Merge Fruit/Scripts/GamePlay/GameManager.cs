@@ -13,6 +13,7 @@ public class GameManager : Singleton<GameManager>
     private void OnEnable()
     {
         Application.targetFrameRate = 60;
+        AudioManager.Instance.PlayMusic("Game_Play");
         SetID();
     }
 
@@ -28,6 +29,9 @@ public class GameManager : Singleton<GameManager>
         PlayerPrefs.SetInt(DataKey.BoomBoost, 1);
         PlayerPrefs.SetInt(DataKey.UpgradeBoost, 1);
         PlayerPrefs.SetInt(DataKey.ShakeBoost, 1);
+        PlayerPrefs.SetInt(DataKey.Use_Music, 1);
+        PlayerPrefs.SetInt(DataKey.Use_Vibrate, 1);
+        PlayerPrefs.SetInt(DataKey.Use_SFX, 1);
     }
 
     private void SetID()

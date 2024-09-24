@@ -327,8 +327,7 @@ public class UIManager : Singleton<UIManager>
 
     private void ShowEndPanel(object param)
     {
-        //StartCoroutine(ShowImg());
-        CaptureFullScreenAndShowOnEndPanel();
+        StartCoroutine(CaptureFullScreenAndShowOnEndPanel());
     }
 
     public void PostEventDelay(EventID eventID)
@@ -341,9 +340,60 @@ public class UIManager : Singleton<UIManager>
         yield return new WaitForSeconds(0.5f);
         EventDispatcher.Instance.PostEvent(eventID);
     }
-
-    public void CaptureFullScreenAndShowOnEndPanel()
+    
+    public void CaptureFullScreenAndShowOnEndPanel1()
     {
+        captureCam.gameObject.SetActive(true);
+    
+        int screenWidth = Screen.currentResolution.width;
+        int screenHeight = Screen.currentResolution.height;
+        if (screenWidth > screenHeight)
+        {
+            (screenWidth, screenHeight) = (screenHeight, screenWidth);
+        }   
+        Debug.Log(screenWidth + "\t" + screenHeight);
+
+        RenderTexture rt = new RenderTexture(screenWidth, screenHeight, 24);
+        rt.antiAliasing = 8;
+        captureCam.targetTexture = rt;
+        captureCam.Render();
+
+        RenderTexture.active = rt;
+        Texture2D screenshot = new Texture2D(screenWidth, screenHeight, TextureFormat.RGB24, false);
+        screenshot.ReadPixels(new Rect(0, 0, screenWidth, screenHeight), 0, 0);
+        Debug.Log(screenshot.width + "\t" + screenshot.height);
+        screenshot.Apply();
+
+        captureCam.targetTexture = null;
+        RenderTexture.active = null;
+        Destroy(rt);
+
+        // // Cắt ảnh (600x750) tại vị trí (0, 50) của ảnh vừa chụp
+        // Texture2D croppedScreenshot = new Texture2D((int)(screenshot.width * 600f / 750f), 
+        //     (int)(screenshot.height * 750f / 1334f));
+        //
+        // croppedScreenshot.SetPixels(screenshot.GetPixels(0, (int)(screenshot.height * 50f / 1334f), 
+        //     (int)(screenshot.width * 600f / 750f), (int)(screenshot.height * 750f / 1334f))); 
+        //
+        // croppedScreenshot.Apply();
+
+        Sprite screenshotSprite = Sprite.Create(screenshot, new Rect(0, 0, screenshot.width, screenshot.height), 
+            new Vector2(0.5f, 0.5f));
+
+        // Gán Sprite cho endImage và chỉnh lại kích thước về 450x500
+        endPanel.endImage.sprite = screenshotSprite;
+        endPanel.endImage.rectTransform.sizeDelta = new Vector2(450, 500); // Chỉnh lại width và height của endImage
+
+        // Hiển thị endPanel
+        SetCanvasSortingLayer("UI");
+        captureCam.gameObject.SetActive(false);
+        endPanel.gameObject.SetActive(true);
+        endPanel.scoreText.text = "Score: " + ScoreManager.Instance.curScore;
+    }
+
+    public IEnumerator CaptureFullScreenAndShowOnEndPanel()
+    {
+        yield return new WaitForEndOfFrame();
         captureCam.gameObject.SetActive(true);
         int screenWidth = Screen.currentResolution.width;
         int screenHeight = Screen.currentResolution.height;
@@ -381,12 +431,67 @@ public class UIManager : Singleton<UIManager>
     {
         int originalWidth = Screen.currentResolution.width;
         int originalHeight = Screen.currentResolution.height;
+        if (originalWidth > originalHeight)
+        { 
+            (originalWidth, originalHeight) = (originalHeight, originalWidth);
+        }
 
-        float scaleX = 0.65f * (float)targetWidth / originalWidth;
-        float scaleY = 0.65f * (float)targetHeight / originalHeight;
+        Debug.Log(originalWidth + "\t" + originalHeight);
+
+        float scaleX = 0.65f * targetWidth / originalWidth;
+        float scaleY = 0.65f * targetHeight / originalHeight;
 
         Vector2 newScale = new Vector2(scaleX, scaleY);
 
+        if (newScale.x * originalWidth < 450)
+        {
+            var scaleAdd = (450 - newScale.x * originalWidth) / originalWidth;
+            newScale = new Vector2(newScale.x + scaleAdd, newScale.y);
+            Debug.Log(1);
+        }
+        else if (newScale.x * originalWidth > 450)
+        {
+            var scaleAdd = (-450 + newScale.x * originalWidth) / originalWidth;
+            
+            if ((float)originalHeight / originalWidth < 2f)
+            {
+                Debug.Log(2);
+                newScale = new Vector2(newScale.x - scaleAdd, newScale.y);
+            }
+            else
+            {
+                Debug.Log(3);
+                newScale = new Vector2(newScale.x - scaleAdd / 2f, newScale.y);
+            }
+        }
+        
+        if (newScale.y * originalHeight < 500)
+        {
+            var scaleAdd = (500 - newScale.y * originalHeight) / originalHeight;
+            newScale = new Vector2(newScale.x, newScale.y + scaleAdd);
+            Debug.Log(4);
+        }
+        else if (newScale.y * originalHeight > 500)
+        {
+            var scaleAdd = (-500 + newScale.y * originalHeight) / originalHeight;
+            if ((float)originalHeight / originalWidth < 2f)
+            {
+                Debug.Log(5);
+                newScale = new Vector2(newScale.x, newScale.y - scaleAdd);
+            }
+            else
+            {
+                Debug.Log(6);
+                newScale = new Vector2(newScale.x, newScale.y);
+            }
+        }
+
+        if ((float)originalHeight / originalWidth < 2f)
+        {
+            Debug.Log("x");
+            newScale = new Vector2(newScale.x * 1.25f, newScale.y * 1.5f);
+        }
+        
         originalImage.rectTransform.localScale = new Vector3(newScale.x, newScale.y, 1);
     }
 }

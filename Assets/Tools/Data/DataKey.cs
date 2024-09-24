@@ -21,17 +21,17 @@ public static class DataKey
 
     public static bool IsUseMusic()
     {
-        return PlayerPrefs.GetInt(Use_Music) == 0; 
+        return PlayerPrefs.GetInt(Use_Music) == 1; 
     }
     
     public static bool IsUseVibrate()
     {
-        return PlayerPrefs.GetInt(Use_Vibrate) == 0; 
+        return PlayerPrefs.GetInt(Use_Vibrate) == 1; 
     }
     
     public static bool IsUseSound()
     {
-        return PlayerPrefs.GetInt(Use_SFX) == 0; 
+        return PlayerPrefs.GetInt(Use_SFX) == 1; 
     }
 
     public static bool IsPlayerPlayFirstTime()

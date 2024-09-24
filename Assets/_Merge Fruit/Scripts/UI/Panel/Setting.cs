@@ -79,7 +79,6 @@ public class Setting : BasePanel
             else if (vibrateImage.sprite == nonVibrate)
             {
                 vibrateImage.sprite = vibrate;
-                
                 PlayerPrefs.SetInt(DataKey.Use_Vibrate, 1);
             }
         });
@@ -91,14 +90,12 @@ public class Setting : BasePanel
                 musicImage.sprite = nonMusic;
                 PlayerPrefs.SetInt(DataKey.Use_Music, 0);
                 AudioManager.Instance.ToggleMusic(true);
-                AudioManager.Instance.ToggleSFX(true);
             }
             else if (musicImage.sprite == nonMusic)
             {
                 musicImage.sprite = music;
                 PlayerPrefs.SetInt(DataKey.Use_Music, 1);
                 AudioManager.Instance.ToggleMusic(false);
-                AudioManager.Instance.ToggleSFX(false);
             }
         });
         
@@ -108,14 +105,12 @@ public class Setting : BasePanel
             {
                 soundImage.sprite = nonSound;
                 PlayerPrefs.SetInt(DataKey.Use_SFX, 0);
-                AudioManager.Instance.ToggleMusic(true);
                 AudioManager.Instance.ToggleSFX(true);
             }
             else if (soundImage.sprite == nonSound)
             {
                 soundImage.sprite = sound;
                 PlayerPrefs.SetInt(DataKey.Use_SFX, 1);
-                AudioManager.Instance.ToggleMusic(false);
                 AudioManager.Instance.ToggleSFX(false);
             }
         });

@@ -39,6 +39,7 @@ public class TreeSlider : Singleton<TreeSlider>
 
     private IEnumerator DetachFruit()
     {
+        AudioManager.Instance.PlaySFX("Mouse_Up");
         lines.gameObject.SetActive(false);
         FruitBox.Instance.AddFruit(curFruit);
         canhold = false;
